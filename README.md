@@ -5,5 +5,5 @@
 # It uses a Thread internally which means it will much faster.
 
 
-# CopyFIlesjar.jar is attached in the repository you can run directly on the Windown system .
+# CopyFIlesjar.exe is attached in the repository you can run directly on the Windown system .
 Please feel free to provide feedback 
