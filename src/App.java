@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -124,7 +125,13 @@ public class App extends JFrame {
 		progressBar.setBounds(162, 350, 415, 21);
 		contentPane.add(progressBar);
 		
-		progressBar.setValue(0);
+		progressBar.setVisible(false);
+		
+		
+		String[] imgExtenstion= {"apng","avif","gif","pjp","pjpeg","jfif","jpeg","jpg"};
+		String[] videoExtenstion= {"WEBM","MP4","MKV","MOV","WMV","AVI","AVCHD","FLV","F4V","SWF"};
+		String[] docsExtension= {"Doc","Docx","TXT","HTML","PDF","PPT","PPTX","PPTX","XLS","XLSM","XLSX","json"};
+		
 		allCheckBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -172,7 +179,10 @@ public class App extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 //				String source=sourceFolder.getText();
 				try {
+					progressBar.setValue(0);
+					progressBar.setVisible(true);
 					LocalDateTime d1=LocalDateTime.now();
+					System.out.println(" buildFileExtentions "+fileExtentions.size());
 					buildFileExtentions();
 					FindListOfFiles(sourceFolder,fileExtentions);
 					DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");  
@@ -212,7 +222,10 @@ public class App extends JFrame {
 								FindListOfFiles(children[i],fileExtentions);
 							}
 							else {
-								if(checkExtention(children[i].getName(),fileExtentions)) {
+								if(fileExtentions.contains("All")) {
+									this.fileList.add(children[i]);
+								}
+								else if(checkExtention(children[i].getName(),fileExtentions)) {
 									this.fileList.add(children[i]);
 								}
 							}
@@ -225,7 +238,7 @@ public class App extends JFrame {
 			private boolean checkExtention(String fileName, ArrayList<String> fileExtentions) {
 				Boolean value = false;
 				for (String string : fileExtentions) {
-					if(fileName.endsWith(string) || fileName.endsWith(string.toUpperCase())) {
+					if(fileName.toUpperCase().endsWith(string.toUpperCase())) {
 						value = true;
 						break;
 					}
@@ -237,18 +250,46 @@ public class App extends JFrame {
 			}
 
 			private void buildFileExtentions() {
+				if(fileExtentions.size()>0) {
+					fileExtentions.clear();
+				}
 				if(allCheckBox.isSelected()) {
-					fileExtentions.add("All");
+					addAllExtention();
 				}else {
 					if(imgCheckBox_1.isSelected()) {
-						fileExtentions.add("jpg");
+						addImgExtention(imgExtenstion);
 					}else if(videosCheckBox_2.isSelected()) {
-						fileExtentions.add("mp4");
+						addVideoExtention(videoExtenstion);
 					}else if(docsCheckBox_3.isSelected()) {
-						fileExtentions.add("json");
+						addDocsExtention(docsExtension);
 					}
 				}
 				
+			}
+
+			private void addDocsExtention(String[] docsExtension) {
+				for (String string : docsExtension) {
+					fileExtentions.add(string);
+				}
+			}
+
+			private void addVideoExtention(String[] videoExtenstion) {
+				for (String string : videoExtenstion) {
+					fileExtentions.add(string);
+				}
+			}
+
+			private void addAllExtention() {
+				if(fileExtentions.size()>0) {
+					fileExtentions.clear();
+				}
+				fileExtentions.add("All");
+			}
+
+			private void addImgExtention(String[] imgExtenstion) {
+				for (String string : imgExtenstion) {
+					fileExtentions.add(string);
+				}
 			}
 		});
 		copyButton.setBounds(245, 283, 204, 44);
@@ -324,8 +365,10 @@ public class App extends JFrame {
 //			System.out.println("progressBarTask thread CopyFileWithThread.written "+CopyFileWithThread.written);
 			try {
 				while(CopyFileWithThread.written < totalSize) {
-//					System.out.println("called "+totalSize);
-//					System.out.println("CopyFileWithThread.written "+CopyFileWithThread.written);
+					if(CopyFileWithThread.written > totalSize-10) {
+						System.out.println("called "+totalSize);
+						System.out.println("CopyFileWithThread.written "+CopyFileWithThread.written);
+					}
 					if(CopyFileWithThread.written >= (totalSize-5)) {
 						 value=100;
 					}else {
@@ -334,7 +377,7 @@ public class App extends JFrame {
 					
 					progressBar.setValue(value);
 //					System.out.println(" progress bar value "+progressBar.getValue());
-					Thread.sleep(50);
+					Thread.sleep(10);
 				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
